@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <thread>
 
 void sortArray(std::vector<int>& array);
 void print_vector(std::vector<int>& array);
@@ -61,13 +62,25 @@ void combine(std::vector<int>& array, int lo1, int hi1, int lo2, int hi2) {
     return;
 }
 
+int foo (int x) {
+    return x;
+}
+
+
 void mergesort(std::vector<int>& array, int lo, int hi) {
     if (lo == hi || lo > hi || hi - lo <= 1) {
         return;
     }
+    //add a thread to do the other half of the work
     int mid = lo + ((hi - lo) / 2);
     mergesort(array, lo, mid);
-    mergesort(array, mid, hi);
+    if (lo == 0 && hi == array.size()) {
+        std::thread right = std::thread(mergesort, std::ref(array), mid, hi);
+        right.join();
+    } else {
+        mergesort(array, mid, hi);
+    }
+
     combine(array, lo, mid, mid, hi);
     return;
 }
